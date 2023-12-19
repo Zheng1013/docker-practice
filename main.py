@@ -1,13 +1,23 @@
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
-
+from fastapi.middleware.cors import CORSMiddleware
 import crud, models, schemas
 from database import SessionLocal, engine
 import uvicorn
 
 models.Base.metadata.create_all(bind=engine)
- 
+
 app = FastAPI()
+
+# 设置 CORS 配置
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 此处示例中允许所有源，可以根据需要设置特定源
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 
 # Dependency
@@ -17,6 +27,7 @@ def get_db():
         yield db
     finally:
         db.close()
+
 
 
 @app.post("/users/", response_model=schemas.User)
